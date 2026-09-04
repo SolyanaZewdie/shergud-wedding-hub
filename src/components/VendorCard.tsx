@@ -10,8 +10,8 @@ export function VendorCard({
   onToggleSave,
 }: {
   listing: Listing;
-  saved?: boolean;
-  onToggleSave?: () => void;
+  saved?: boolean | undefined;
+  onToggleSave?: (() => void) | undefined;
 }) {
   return (
     <article className="group overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-shadow hover:shadow-lift">
