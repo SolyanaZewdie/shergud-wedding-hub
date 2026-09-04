@@ -24,12 +24,12 @@ import {
 import { useAuth } from "@/lib/auth";
 
 type Search = {
-  category?: string;
-  location?: string;
-  maxPrice?: number;
-  minRating?: number;
-  sort?: SortKey;
-  q?: string;
+  category?: string | undefined;
+  location?: string | undefined;
+  maxPrice?: number | undefined;
+  minRating?: number | undefined;
+  sort?: SortKey | undefined;
+  q?: string | undefined;
 };
 
 const SORTS: { value: SortKey; label: string }[] = [
@@ -44,12 +44,12 @@ const LOCATIONS = ["Addis Ababa", "Bahir Dar", "Hawassa", "Adama", "Mekelle", "G
 
 export const Route = createFileRoute("/vendors/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    category: typeof search.category === "string" ? search.category : undefined,
-    location: typeof search.location === "string" ? search.location : undefined,
-    maxPrice: search.maxPrice ? Number(search.maxPrice) : undefined,
-    minRating: search.minRating ? Number(search.minRating) : undefined,
-    sort: (SORTS.find((s) => s.value === search.sort)?.value ?? "rating") as SortKey,
-    q: typeof search.q === "string" ? search.q : undefined,
+    category: typeof search["category"] === "string" ? (search["category"] as string) : undefined,
+    location: typeof search["location"] === "string" ? (search["location"] as string) : undefined,
+    maxPrice: search["maxPrice"] ? Number(search["maxPrice"]) : undefined,
+    minRating: search["minRating"] ? Number(search["minRating"]) : undefined,
+    sort: (SORTS.find((s) => s.value === search["sort"])?.value ?? "rating") as SortKey,
+    q: typeof search["q"] === "string" ? (search["q"] as string) : undefined,
   }),
   head: () => ({
     meta: [

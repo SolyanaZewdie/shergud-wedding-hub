@@ -20,12 +20,12 @@ export type Listing = {
 };
 
 export type MarketplaceFilters = {
-  category?: string;
-  location?: string;
-  maxPrice?: number;
-  minRating?: number;
+  category?: string | undefined;
+  location?: string | undefined;
+  maxPrice?: number | undefined;
+  minRating?: number | undefined;
   sort: SortKey;
-  search?: string;
+  search?: string | undefined;
 };
 
 /** Resolves a stored image reference (storage path or absolute URL) to a viewable URL. */

@@ -10,11 +10,11 @@ import { fetchConversations, fetchMessages, sendMessage } from "@/lib/data";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
-type Search = { conversation?: string };
+type Search = { conversation?: string | undefined };
 
 export const Route = createFileRoute("/_authenticated/messages")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    conversation: typeof search.conversation === "string" ? search.conversation : undefined,
+    conversation: typeof search["conversation"] === "string" ? (search["conversation"] as string) : undefined,
   }),
   head: () => ({
     meta: [
