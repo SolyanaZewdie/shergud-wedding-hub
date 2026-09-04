@@ -168,7 +168,7 @@ function StatCard({
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
-  note?: string;
+  note?: string | undefined;
 }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
