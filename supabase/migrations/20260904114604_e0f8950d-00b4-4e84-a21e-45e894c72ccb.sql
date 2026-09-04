@@ -1,0 +1,10 @@
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.set_updated_at() FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.in_conversation(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.owns_vendor(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.has_role(uuid, public.app_role) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.vendor_is_approved(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.in_conversation(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.owns_vendor(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.vendor_is_approved(uuid) TO anon, authenticated;

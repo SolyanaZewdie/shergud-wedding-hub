@@ -1,0 +1,4 @@
+CREATE POLICY "portfolio images viewable" ON storage.objects FOR SELECT TO anon, authenticated USING (bucket_id = 'vendor-portfolio');
+CREATE POLICY "vendor uploads own folder" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'vendor-portfolio' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "vendor updates own folder" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'vendor-portfolio' AND (storage.foldername(name))[1] = auth.uid()::text);
+CREATE POLICY "vendor deletes own folder" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'vendor-portfolio' AND (storage.foldername(name))[1] = auth.uid()::text);
