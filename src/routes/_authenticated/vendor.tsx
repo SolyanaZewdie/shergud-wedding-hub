@@ -37,7 +37,7 @@ export const Route = createFileRoute("/_authenticated/vendor")({
       },
     ],
   }),
-  component: VendorStudio;
+  component: VendorStudio,
 });
 
 function VendorStudio() {
