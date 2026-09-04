@@ -97,10 +97,7 @@ function VendorProfile() {
       <div className="min-h-screen">
         <SiteHeader />
         <div className="mx-auto max-w-3xl px-4 py-16">
-          <ErrorState
-            message="We couldn't load this vendor."
-            onRetry={() => query.refetch()}
-          />
+          <ErrorState message="We couldn't load this vendor." onRetry={() => query.refetch()} />
         </div>
       </div>
     );

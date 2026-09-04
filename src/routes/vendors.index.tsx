@@ -179,7 +179,9 @@ function Marketplace() {
               step={1000}
               placeholder="Any"
               value={search.maxPrice ?? ""}
-              onChange={(e) => update({ maxPrice: e.target.value ? Number(e.target.value) : undefined })}
+              onChange={(e) =>
+                update({ maxPrice: e.target.value ? Number(e.target.value) : undefined })
+              }
             />
           </div>
 

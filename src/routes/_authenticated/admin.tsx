@@ -18,7 +18,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { title: "Admin — Shergud Vendor Verification" },
       {
         name: "description",
-        content: "Review, approve and reject vendor listings before they appear in the marketplace.",
+        content:
+          "Review, approve and reject vendor listings before they appear in the marketplace.",
       },
       { property: "og:title", content: "Admin — Shergud Vendor Verification" },
       {
@@ -64,13 +65,7 @@ function AdminPage() {
   });
 
   const decide = useMutation({
-    mutationFn: async ({
-      id,
-      decision,
-    }: {
-      id: string;
-      decision: "approved" | "rejected";
-    }) => {
+    mutationFn: async ({ id, decision }: { id: string; decision: "approved" | "rejected" }) => {
       const payload =
         decision === "approved"
           ? {
@@ -217,9 +212,7 @@ function AdminPage() {
                           className="h-9 w-full sm:w-64"
                           placeholder="Reason for rejection"
                           value={reasons[vendor.id] ?? ""}
-                          onChange={(e) =>
-                            setReasons({ ...reasons, [vendor.id]: e.target.value })
-                          }
+                          onChange={(e) => setReasons({ ...reasons, [vendor.id]: e.target.value })}
                         />
                         <Button
                           size="sm"

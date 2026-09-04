@@ -84,11 +84,7 @@ export function SiteHeader() {
           )}
         </div>
 
-        <button
-          className="md:hidden"
-          aria-label="Toggle menu"
-          onClick={() => setOpen((o) => !o)}
-        >
+        <button className="md:hidden" aria-label="Toggle menu" onClick={() => setOpen((o) => !o)}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>

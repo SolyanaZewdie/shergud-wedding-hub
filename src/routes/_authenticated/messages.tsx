@@ -14,14 +14,16 @@ type Search = { conversation?: string | undefined };
 
 export const Route = createFileRoute("/_authenticated/messages")({
   validateSearch: (search: Record<string, unknown>): Search => ({
-    conversation: typeof search["conversation"] === "string" ? (search["conversation"] as string) : undefined,
+    conversation:
+      typeof search["conversation"] === "string" ? (search["conversation"] as string) : undefined,
   }),
   head: () => ({
     meta: [
       { title: "Messages — Shergud" },
       {
         name: "description",
-        content: "Chat with wedding vendors and couples. All conversations are saved to your account.",
+        content:
+          "Chat with wedding vendors and couples. All conversations are saved to your account.",
       },
       { property: "og:title", content: "Messages — Shergud" },
       { property: "og:description", content: "Your saved conversations with vendors and couples." },

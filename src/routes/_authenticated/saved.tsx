@@ -31,7 +31,10 @@ function SavedVendors() {
   const query = useQuery({
     queryKey: ["saved-list", user?.id],
     queryFn: async () => {
-      const saved = await supabase.from("saved_vendors").select("vendor_id").eq("couple_id", user!.id);
+      const saved = await supabase
+        .from("saved_vendors")
+        .select("vendor_id")
+        .eq("couple_id", user!.id);
       if (saved.error) throw saved.error;
       const ids = (saved.data ?? []).map((r) => r.vendor_id);
       if (!ids.length) return [] as Listing[];

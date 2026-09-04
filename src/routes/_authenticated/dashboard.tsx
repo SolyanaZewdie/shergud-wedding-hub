@@ -34,7 +34,10 @@ function Dashboard() {
     queryFn: async () => {
       const [couple, saved, conversations] = await Promise.all([
         supabase.from("couple_profiles").select("*").eq("user_id", user!.id).maybeSingle(),
-        supabase.from("saved_vendors").select("vendor_id", { count: "exact", head: true }).eq("couple_id", user!.id),
+        supabase
+          .from("saved_vendors")
+          .select("vendor_id", { count: "exact", head: true })
+          .eq("couple_id", user!.id),
         supabase.from("conversations").select("id", { count: "exact", head: true }),
       ]);
       if (couple.error) throw couple.error;
@@ -83,9 +86,7 @@ function Dashboard() {
 
   const couple = data.data?.couple;
   const daysAway = couple?.wedding_date
-    ? Math.ceil(
-        (new Date(couple.wedding_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-      )
+    ? Math.ceil((new Date(couple.wedding_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     : null;
 
   return (
@@ -123,11 +124,30 @@ function Dashboard() {
                       })
                     : "Not set"
                 }
-                note={daysAway !== null ? (daysAway >= 0 ? `${daysAway} days to go` : "Congratulations!") : undefined}
+                note={
+                  daysAway !== null
+                    ? daysAway >= 0
+                      ? `${daysAway} days to go`
+                      : "Congratulations!"
+                    : undefined
+                }
               />
-              <StatCard icon={Wallet} label="Budget" value={formatBirr(couple.budget)} note={couple.guest_count ? `${couple.guest_count} guests` : undefined} />
-              <StatCard icon={Heart} label="Saved vendors" value={String(data.data?.savedCount ?? 0)} />
-              <StatCard icon={MessageCircle} label="Conversations" value={String(data.data?.conversationCount ?? 0)} />
+              <StatCard
+                icon={Wallet}
+                label="Budget"
+                value={formatBirr(couple.budget)}
+                note={couple.guest_count ? `${couple.guest_count} guests` : undefined}
+              />
+              <StatCard
+                icon={Heart}
+                label="Saved vendors"
+                value={String(data.data?.savedCount ?? 0)}
+              />
+              <StatCard
+                icon={MessageCircle}
+                label="Conversations"
+                value={String(data.data?.conversationCount ?? 0)}
+              />
             </div>
 
             <div className="mt-8 rounded-xl border border-border bg-card p-5">

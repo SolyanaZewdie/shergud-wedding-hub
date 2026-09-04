@@ -100,7 +100,9 @@ function AuthPage() {
       </Link>
 
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-soft sm:p-8">
-        <h1 className="font-display text-2xl">{isSignup ? "Create your account" : "Welcome back"}</h1>
+        <h1 className="font-display text-2xl">
+          {isSignup ? "Create your account" : "Welcome back"}
+        </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
           {isSignup
             ? "Plan your wedding or list your business on Shergud."

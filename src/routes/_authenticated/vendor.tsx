@@ -210,8 +210,7 @@ function VendorStudio() {
         {status ? (
           <div className="mt-5 rounded-lg border border-border bg-card p-4 text-sm">
             <p>
-              Verification status:{" "}
-              <strong className="capitalize">{status}</strong>
+              Verification status: <strong className="capitalize">{status}</strong>
             </p>
             {status === "pending" ? (
               <p className="mt-1 text-muted-foreground">

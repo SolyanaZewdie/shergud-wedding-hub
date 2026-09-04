@@ -118,7 +118,10 @@ export async function fetchVendor(vendorId: string) {
 }
 
 export async function fetchSavedVendorIds(userId: string) {
-  const { data, error } = await supabase.from("saved_vendors").select("vendor_id").eq("couple_id", userId);
+  const { data, error } = await supabase
+    .from("saved_vendors")
+    .select("vendor_id")
+    .eq("couple_id", userId);
   if (error) throw error;
   return (data ?? []).map((r) => r.vendor_id);
 }
