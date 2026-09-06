@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, MapPin, Phone, Star } from "lucide-react";
+import { ArrowLeft, Phone, Star } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { StoredImage } from "@/components/StoredImage";
+import { SaveButton } from "@/components/SaveButton";
+import { Eyebrow } from "@/components/editorial";
+import { Reveal, RevealWords } from "@/components/motion";
 import { ErrorState, LoadingState } from "@/components/state-blocks";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,22 +25,22 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/vendors/$vendorId")({
   head: () => ({
     meta: [
-      { title: "Vendor profile — Shergud" },
+      { title: "Vendor Profile — Shergud ሽር ጉድ" },
       {
         name: "description",
         content:
-          "See packages, pricing, portfolio work and reviews for this verified Shergud wedding vendor.",
+          "Portfolio, packages, pricing and reviews for a verified Shergud wedding vendor. Save them or start a conversation.",
       },
-      { property: "og:title", content: "Vendor profile — Shergud" },
+      { property: "og:title", content: "Vendor Profile — Shergud" },
       {
         property: "og:description",
-        content: "Packages, pricing, portfolio and reviews for a verified Shergud wedding vendor.",
+        content: "Portfolio, packages, pricing and reviews for a verified Shergud wedding vendor.",
       },
     ],
   }),
   component: VendorProfile,
   errorComponent: ({ error }) => <ErrorState message={error.message} />,
-  notFoundComponent: () => <ErrorState message="Vendor not found." />,
+  notFoundComponent: () => <ErrorState message="We couldn't find that vendor." />,
 });
 
 function VendorProfile() {
@@ -87,7 +91,7 @@ function VendorProfile() {
     return (
       <div className="min-h-screen">
         <SiteHeader />
-        <LoadingState label="Loading vendor..." />
+        <LoadingState variant="page" label="Loading vendor" />
       </div>
     );
   }
@@ -96,7 +100,7 @@ function VendorProfile() {
     return (
       <div className="min-h-screen">
         <SiteHeader />
-        <div className="mx-auto max-w-3xl px-4 py-16">
+        <div className="mx-auto max-w-3xl px-5 py-24 sm:px-8">
           <ErrorState message="We couldn't load this vendor." onRetry={() => query.refetch()} />
         </div>
       </div>
@@ -104,169 +108,227 @@ function VendorProfile() {
   }
 
   const { vendor, offerings, portfolio, reviews, rating, startingPrice } = query.data;
+  const cover = portfolio[0]?.image_url ?? null;
+  const rest = portfolio.slice(1);
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
 
-      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-        <Link to="/vendors" className="text-sm text-muted-foreground hover:text-primary">
-          ← Back to marketplace
-        </Link>
+      {/* ---------- Editorial cover ---------- */}
+      <section className="relative">
+        <div className="relative h-[68svh] min-h-[420px] w-full overflow-hidden bg-parchment">
+          <StoredImage
+            path={cover}
+            alt={`Work by ${vendor.business_name}`}
+            eager
+            className="scale-[1.02]"
+          />
+          <div className="scrim-bottom absolute inset-0" aria-hidden />
+          <div className="grain pointer-events-none absolute inset-0" aria-hidden />
 
-        <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground">
-              {vendor.category}
-            </span>
-            <h1 className="mt-3 text-3xl sm:text-4xl">{vendor.business_name}</h1>
-            <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <MapPin className="h-3.5 w-3.5" /> {vendor.location ?? "Ethiopia"}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Star className="h-3.5 w-3.5 fill-accent text-accent" />
-                {rating ?? "New"} {reviews.length ? `(${reviews.length} reviews)` : ""}
-              </span>
-              {vendor.phone ? (
-                <span className="flex items-center gap-1.5">
-                  <Phone className="h-3.5 w-3.5" /> {vendor.phone}
-                </span>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground">Starting from</p>
-            <p className="font-display text-2xl">{formatBirr(startingPrice)}</p>
-            {user && view === "couple" ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-3"
-                onClick={() => save.mutate()}
-                disabled={save.isPending}
-              >
-                <Heart className={saved ? "fill-primary text-primary" : ""} />
-                {saved ? "Saved" : "Save vendor"}
-              </Button>
-            ) : null}
+          <div className="absolute inset-x-0 bottom-0 mx-auto max-w-[1500px] px-5 pb-8 sm:px-8 sm:pb-12">
+            <p className="type-label text-espresso-foreground/80">{vendor.category}</p>
+            <h1 className="type-display mt-4 max-w-3xl text-espresso-foreground">
+              <RevealWords text={vendor.business_name} />
+            </h1>
           </div>
         </div>
 
-        {vendor.description ? (
-          <p className="mt-6 max-w-2xl leading-relaxed text-muted-foreground">
-            {vendor.description}
-          </p>
-        ) : null}
+        <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
+          <Link
+            to="/vendors"
+            search={{ sort: "rating" }}
+            className="link-arrow type-label mt-6 inline-flex text-muted-foreground transition-colors hover:text-primary"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+            Back to the directory
+          </Link>
+        </div>
+      </section>
 
-        <section className="mt-12">
-          <h2 className="text-2xl">Portfolio</h2>
-          {portfolio.length ? (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {portfolio.map((item) => (
-                <StoredImage
-                  key={item.id}
-                  path={item.image_url}
-                  alt={item.title ?? `${vendor.business_name} work sample`}
-                  className="h-52 w-full rounded-lg"
-                />
-              ))}
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No portfolio images yet.</p>
-          )}
-        </section>
-
-        <section className="mt-12">
-          <h2 className="text-2xl">Packages</h2>
-          {offerings.length ? (
-            <div className="mt-4 space-y-3">
-              {offerings.map((offering) => (
-                <div
-                  key={offering.id}
-                  className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-card p-4"
-                >
-                  <div>
-                    <h3 className="font-medium">{offering.name}</h3>
-                    {offering.description ? (
-                      <p className="mt-1 text-sm text-muted-foreground">{offering.description}</p>
-                    ) : null}
-                  </div>
-                  <p className="font-display text-lg">{formatBirr(Number(offering.price))}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No packages listed yet.</p>
-          )}
-        </section>
-
-        <section className="mt-12">
-          <h2 className="text-2xl">Reviews</h2>
-          {reviews.length ? (
-            <div className="mt-4 space-y-3">
-              {reviews.map((review) => (
-                <div key={review.id} className="rounded-lg border border-border bg-card p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-medium">{review.author_name}</p>
-                    <span className="flex items-center gap-1 text-sm">
-                      <Star className="h-3.5 w-3.5 fill-accent text-accent" /> {review.rating}
-                    </span>
-                  </div>
-                  {review.comment ? (
-                    <p className="mt-2 text-sm text-muted-foreground">{review.comment}</p>
-                  ) : null}
-                  {review.is_sample ? (
-                    <p className="mt-2 text-xs uppercase tracking-wide text-muted-foreground">
-                      Sample review
-                    </p>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-muted-foreground">No reviews yet.</p>
-          )}
-        </section>
-
-        <section className="mt-12 rounded-xl border border-border bg-card p-5">
-          <h2 className="text-2xl">Contact {vendor.business_name}</h2>
-          {user && view === "couple" ? (
-            <>
-              <Textarea
-                className="mt-4"
-                rows={4}
-                placeholder="Tell them your wedding date, location and what you need..."
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
+      {/* ---------- Meta strip ---------- */}
+      <section className="mx-auto mt-8 max-w-[1500px] px-5 sm:px-8">
+        <dl className="grid gap-8 border-y border-border py-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <dt className="type-label text-muted-foreground">Where</dt>
+            <dd className="font-display mt-2 text-2xl">{vendor.location ?? "Ethiopia"}</dd>
+          </div>
+          <div>
+            <dt className="type-label text-muted-foreground">Rating</dt>
+            <dd className="font-display mt-2 flex items-center gap-2 text-2xl">
+              <Star className="h-4 w-4 fill-accent text-accent" aria-hidden />
+              {rating ?? "New"}
+              {reviews.length ? (
+                <span className="text-base text-muted-foreground">
+                  {reviews.length} review{reviews.length === 1 ? "" : "s"}
+                </span>
+              ) : null}
+            </dd>
+          </div>
+          <div>
+            <dt className="type-label text-muted-foreground">Starting from</dt>
+            <dd className="font-display mt-2 text-2xl">{formatBirr(startingPrice)}</dd>
+          </div>
+          <div className="flex flex-wrap items-end gap-6">
+            {user && view === "couple" ? (
+              <SaveButton
+                variant="inline"
+                saved={saved}
+                pending={save.isPending}
+                onToggle={() => save.mutate()}
               />
-              <Button
-                className="mt-3"
-                disabled={!draft.trim() || contact.isPending}
-                onClick={() => contact.mutate()}
-              >
-                {contact.isPending ? "Sending..." : "Send message"}
-              </Button>
-            </>
-          ) : user ? (
-            <p className="mt-3 text-sm text-muted-foreground">
-              Switch to the couple view to message vendors.
-            </p>
-          ) : (
-            <div className="mt-3">
-              <p className="text-sm text-muted-foreground">
-                Sign in as a couple to message this vendor and save them to your shortlist.
+            ) : null}
+            {vendor.phone ? (
+              <p className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Phone className="h-3.5 w-3.5" aria-hidden />
+                {vendor.phone}
               </p>
-              <Button className="mt-3" asChild>
-                <Link to="/auth" search={{ mode: "signup" }}>
-                  Sign in to message
-                </Link>
-              </Button>
+            ) : null}
+          </div>
+        </dl>
+      </section>
+
+      {/* ---------- Story + packages ---------- */}
+      <section className="mx-auto max-w-[1500px] px-5 py-20 sm:px-8 sm:py-24">
+        <div className="grid gap-16 lg:grid-cols-[1.3fr_1fr] lg:gap-24">
+          <div>
+            {vendor.description ? (
+              <Reveal>
+                <Eyebrow>About</Eyebrow>
+                <p className="font-display mt-6 text-2xl leading-[1.28] text-pretty sm:text-3xl">
+                  {vendor.description}
+                </p>
+              </Reveal>
+            ) : null}
+
+            <Reveal className="mt-16">
+              <Eyebrow>Packages</Eyebrow>
+              {offerings.length ? (
+                <ul className="mt-6 border-t border-border">
+                  {offerings.map((offering) => (
+                    <li
+                      key={offering.id}
+                      className="flex flex-wrap items-baseline justify-between gap-4 border-b border-border py-6"
+                    >
+                      <div className="max-w-md">
+                        <h3 className="type-title">{offering.name}</h3>
+                        {offering.description ? (
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            {offering.description}
+                          </p>
+                        ) : null}
+                      </div>
+                      <p className="font-display text-2xl">{formatBirr(Number(offering.price))}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-6 text-muted-foreground">
+                  This vendor hasn&apos;t published packages yet — message them for a quote.
+                </p>
+              )}
+            </Reveal>
+
+            {reviews.length ? (
+              <Reveal className="mt-16">
+                <Eyebrow>What couples said</Eyebrow>
+                <ul className="mt-6 grid gap-8 sm:grid-cols-2">
+                  {reviews.map((review) => (
+                    <li key={review.id} className="border-t border-border pt-5">
+                      <p className="flex items-center gap-1.5 text-sm">
+                        <Star className="h-3.5 w-3.5 fill-accent text-accent" aria-hidden />
+                        {review.rating}
+                      </p>
+                      {review.comment ? (
+                        <p className="font-display mt-3 text-xl leading-snug">
+                          &ldquo;{review.comment}&rdquo;
+                        </p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+            ) : null}
+          </div>
+
+          {/* Contact panel */}
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <div className="border border-border bg-card p-6 sm:p-8">
+              <h2 className="type-title">Talk to {vendor.business_name}</h2>
+              {user && view === "couple" ? (
+                <form
+                  className="mt-5 space-y-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!draft.trim()) return;
+                    contact.mutate();
+                  }}
+                >
+                  <Textarea
+                    aria-label="Your message"
+                    rows={5}
+                    className="rounded-none"
+                    placeholder="Hi! We're getting married in December in Addis — are you free?"
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                  />
+                  <Button
+                    type="submit"
+                    className="type-label h-12 w-full rounded-none"
+                    disabled={contact.isPending || !draft.trim()}
+                  >
+                    {contact.isPending ? "Sending..." : "Send message"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Your conversation is saved to your account, so you can pick it up any time.
+                  </p>
+                </form>
+              ) : (
+                <>
+                  <p className="mt-4 text-muted-foreground">
+                    Create a couple account to message vendors and keep a shortlist.
+                  </p>
+                  <Button asChild className="type-label mt-6 h-12 w-full rounded-none">
+                    <Link to="/auth" search={{ mode: "signup" }}>
+                      Start planning
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
-          )}
+          </aside>
+        </div>
+      </section>
+
+      {/* ---------- Portfolio gallery ---------- */}
+      {rest.length ? (
+        <section className="border-t border-border bg-parchment/50 py-20 sm:py-24">
+          <div className="mx-auto max-w-[1500px] px-5 sm:px-8">
+            <Eyebrow>Portfolio</Eyebrow>
+            <h2 className="type-headline mt-5 max-w-xl">Their work, at full size.</h2>
+
+            <div className="mt-12 columns-1 gap-6 sm:columns-2 lg:columns-3 [&>*]:mb-6">
+              {rest.map((item, i) => (
+                <Reveal key={item.id} variant="zoom" delay={(i % 3) * 80} className="block">
+                  <div className="w-full overflow-hidden bg-parchment">
+                    <StoredImage
+                      path={item.image_url}
+                      alt={item.title ?? `${vendor.business_name} work sample`}
+                      className={i % 3 === 1 ? "aspect-3/4" : "aspect-4/5"}
+                    />
+                  </div>
+                  {item.title ? (
+                    <p className="type-label mt-3 text-muted-foreground">{item.title}</p>
+                  ) : null}
+                </Reveal>
+              ))}
+            </div>
+          </div>
         </section>
-      </div>
+      ) : null}
+
+      <SiteFooter />
     </div>
   );
 }
