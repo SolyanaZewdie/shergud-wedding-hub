@@ -22,10 +22,17 @@ export function useInView<T extends HTMLElement>(options?: { threshold?: number;
           }
         }
       },
-      { threshold: options?.threshold ?? 0.15, rootMargin: options?.rootMargin ?? "0px 0px -8% 0px" },
+      { threshold: options?.threshold ?? 0.05, rootMargin: options?.rootMargin ?? "0px 0px -5% 0px" },
     );
     observer.observe(node);
-    return () => observer.disconnect();
+
+    // Safety net: content must never stay hidden if the observer misfires.
+    const fallback = window.setTimeout(() => setVisible(true), 1500);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, [options?.threshold, options?.rootMargin]);
 
   return { ref, visible };
