@@ -2,15 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import { resolveImageUrl } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
+/**
+ * Renders an image stored in the private portfolio bucket (or an absolute URL).
+ * Always fills its parent — give the parent the aspect ratio you want.
+ */
 export function StoredImage({
   path,
   alt,
   className,
+  wrapperClassName,
   eager = false,
 }: {
   path: string | null | undefined;
   alt: string;
   className?: string;
+  wrapperClassName?: string;
   eager?: boolean;
 }) {
   const { data, isLoading } = useQuery({
@@ -24,23 +30,27 @@ export function StoredImage({
     return (
       <div
         className={cn(
-          "flex items-center justify-center bg-secondary text-xs text-muted-foreground",
+          "grain flex h-full w-full items-center justify-center bg-parchment",
+          wrapperClassName,
           className,
         )}
       >
-        No image yet
+        <span className="type-label text-muted-foreground/70">Shergud</span>
       </div>
     );
   }
 
-  if (!data) return <div className={cn("animate-pulse bg-secondary", className)} />;
+  if (!data) {
+    return <div className={cn("h-full w-full animate-pulse bg-parchment", wrapperClassName, className)} />;
+  }
 
   return (
     <img
       src={data}
       alt={alt}
       loading={eager ? "eager" : "lazy"}
-      className={cn("object-cover", className)}
+      decoding="async"
+      className={cn("h-full w-full object-cover", className)}
     />
   );
 }
