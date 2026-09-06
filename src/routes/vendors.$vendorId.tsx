@@ -212,7 +212,7 @@ function VendorProfile() {
                       className="flex flex-wrap items-baseline justify-between gap-4 border-b border-border py-6"
                     >
                       <div className="max-w-md">
-                        <h3 className="type-title">{offering.title}</h3>
+                        <h3 className="type-title">{offering.name}</h3>
                         {offering.description ? (
                           <p className="mt-2 text-sm text-muted-foreground">
                             {offering.description}
