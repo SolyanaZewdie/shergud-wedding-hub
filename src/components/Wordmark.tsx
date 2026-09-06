@@ -30,7 +30,8 @@ export function Wordmark({
       </span>
       <span
         className={cn(
-          "font-ethiopic leading-none text-primary transition-all duration-500",
+          "font-ethiopic leading-none transition-all duration-500",
+          tone === "light" ? "text-accent" : "text-primary",
           compact ? "text-sm" : "text-base sm:text-lg",
         )}
       >

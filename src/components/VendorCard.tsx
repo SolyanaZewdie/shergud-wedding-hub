@@ -1,73 +1,66 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, MapPin, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { StoredImage } from "@/components/StoredImage";
+import { SaveButton } from "@/components/SaveButton";
 import { formatBirr, type Listing } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
+/**
+ * Editorial vendor card: photograph first, metadata as quiet caption text.
+ */
 export function VendorCard({
   listing,
   saved,
   onToggleSave,
+  index = 0,
+  className,
 }: {
   listing: Listing;
   saved?: boolean | undefined;
   onToggleSave?: (() => void) | undefined;
+  index?: number;
+  className?: string;
 }) {
   return (
-    <article className="group overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-shadow hover:shadow-lift">
-      <div className="relative">
-        <Link to="/vendors/$vendorId" params={{ vendorId: listing.id }} className="block">
+    <article className={cn("group/card relative", className)}>
+      <Link
+        to="/vendors/$vendorId"
+        params={{ vendorId: listing.id }}
+        className="block focus-visible:outline-offset-4"
+      >
+        <div className="relative aspect-4/5 w-full overflow-hidden bg-parchment">
           <StoredImage
             path={listing.cover_image}
-            alt={`${listing.business_name} portfolio cover`}
-            className="h-48 w-full transition-transform duration-500 group-hover:scale-[1.03]"
+            alt={`Work by ${listing.business_name}`}
+            eager={index < 3}
+            className="transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.05]"
           />
-        </Link>
-        {onToggleSave ? (
-          <button
-            onClick={onToggleSave}
-            aria-label={saved ? "Remove from saved" : "Save vendor"}
-            className="absolute right-3 top-3 rounded-full bg-background/90 p-2 shadow-soft transition-colors hover:bg-background"
-          >
-            <Heart
-              className={cn(
-                "h-4 w-4",
-                saved ? "fill-primary text-primary" : "text-muted-foreground",
-              )}
-            />
-          </button>
-        ) : null}
-      </div>
-
-      <div className="space-y-2 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <Link to="/vendors/$vendorId" params={{ vendorId: listing.id }}>
-            <h3 className="font-display text-lg leading-tight">{listing.business_name}</h3>
-          </Link>
-          <span className="shrink-0 rounded-full bg-secondary px-2.5 py-0.5 text-xs text-secondary-foreground">
+          <span className="type-label absolute bottom-0 left-0 bg-background/90 px-3 py-2 text-foreground backdrop-blur-sm">
             {listing.category}
           </span>
         </div>
 
-        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <MapPin className="h-3.5 w-3.5" />
-          {listing.location ?? "Ethiopia"}
-        </p>
+        <div className="mt-5">
+          <div className="flex items-baseline justify-between gap-4">
+            <h3 className="type-title text-balance transition-colors group-hover/card:text-primary">
+              {listing.business_name}
+            </h3>
+            <span className="type-label flex shrink-0 items-center gap-1.5 text-muted-foreground">
+              <Star className="h-3 w-3 fill-accent text-accent" aria-hidden />
+              {listing.rating ?? "New"}
+              {listing.review_count ? <span className="opacity-60">({listing.review_count})</span> : null}
+            </span>
+          </div>
 
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-sm">
-            <span className="text-muted-foreground">from </span>
-            <span className="font-medium">{formatBirr(listing.starting_price)}</span>
-          </span>
-          <span className="flex items-center gap-1 text-sm">
-            <Star className="h-3.5 w-3.5 fill-accent text-accent" />
-            <span className="font-medium">{listing.rating ?? "New"}</span>
-            {listing.review_count ? (
-              <span className="text-muted-foreground">({listing.review_count})</span>
-            ) : null}
-          </span>
+          <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+            <span>{listing.location ?? "Ethiopia"}</span>
+            <span aria-hidden className="h-3 w-px bg-border" />
+            <span>from {formatBirr(listing.starting_price)}</span>
+          </p>
         </div>
-      </div>
+      </Link>
+
+      {onToggleSave ? <SaveButton saved={Boolean(saved)} onToggle={onToggleSave} /> : null}
     </article>
   );
 }
