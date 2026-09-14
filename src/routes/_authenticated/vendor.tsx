@@ -6,6 +6,8 @@ import { Trash2 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StoredImage } from "@/components/StoredImage";
 import { EmptyState, ErrorState, LoadingState } from "@/components/state-blocks";
+import { Eyebrow } from "@/components/editorial";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
