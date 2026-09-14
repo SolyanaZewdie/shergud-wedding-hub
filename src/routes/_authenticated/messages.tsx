@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { EmptyState, ErrorState, LoadingState } from "@/components/state-blocks";
+import { Eyebrow } from "@/components/editorial";
+
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchConversations, fetchMessages, sendMessage } from "@/lib/data";
