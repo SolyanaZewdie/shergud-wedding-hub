@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { CalendarHeart, Heart, MessageCircle, Wallet } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { EmptyState, ErrorState, LoadingState } from "@/components/state-blocks";
+import { Eyebrow } from "@/components/editorial";
+
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBirr } from "@/lib/data";
