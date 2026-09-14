@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { CalendarHeart, Heart, MessageCircle, Wallet } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { EmptyState, ErrorState, LoadingState } from "@/components/state-blocks";
+import { Eyebrow } from "@/components/editorial";
+
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { formatBirr } from "@/lib/data";
@@ -90,28 +92,42 @@ function Dashboard() {
     : null;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
-      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-        <h1 className="text-3xl sm:text-4xl">
-          {profile?.full_name ? `${profile.full_name}'s wedding` : "Our wedding"}
-        </h1>
 
+      <header className="grain border-b border-border bg-secondary/40">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+          <Eyebrow>Your wedding ledger</Eyebrow>
+          <h1 className="type-display mt-5 text-balance">
+            {profile?.full_name ? `${profile.full_name}'s wedding` : "Our wedding"}
+          </h1>
+          {couple?.wedding_date && daysAway !== null ? (
+            <div className="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+              <span className="type-mega leading-none text-primary">
+                {daysAway >= 0 ? daysAway : "—"}
+              </span>
+              <span className="type-label text-muted-foreground">
+                {daysAway >= 0 ? "days until you say yes" : "congratulations, you did it"}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
         {!couple ? (
-          <div className="mt-8">
-            <EmptyState
-              title="Let's set up your wedding"
-              description="Add your date, city, guests and budget so we can tailor everything."
-              action={
-                <Button asChild>
-                  <Link to="/onboarding">Start setup</Link>
-                </Button>
-              }
-            />
-          </div>
+          <EmptyState
+            title="Let's set up your wedding"
+            description="Add your date, city, guests and budget so we can tailor everything."
+            action={
+              <Button asChild>
+                <Link to="/onboarding">Start setup</Link>
+              </Button>
+            }
+          />
         ) : (
           <>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <dl className="grid gap-x-10 border-t border-border sm:grid-cols-2 lg:grid-cols-4">
               <StatCard
                 icon={CalendarHeart}
                 label="Wedding day"
@@ -124,13 +140,7 @@ function Dashboard() {
                       })
                     : "Not set"
                 }
-                note={
-                  daysAway !== null
-                    ? daysAway >= 0
-                      ? `${daysAway} days to go`
-                      : "Congratulations!"
-                    : undefined
-                }
+                note={couple.wedding_location ?? undefined}
               />
               <StatCard
                 icon={Wallet}
@@ -140,38 +150,57 @@ function Dashboard() {
               />
               <StatCard
                 icon={Heart}
-                label="Saved vendors"
+                label="Shortlisted"
                 value={String(data.data?.savedCount ?? 0)}
+                note="vendors saved"
               />
               <StatCard
                 icon={MessageCircle}
                 label="Conversations"
                 value={String(data.data?.conversationCount ?? 0)}
+                note="with vendors"
               />
-            </div>
+            </dl>
 
-            <div className="mt-8 rounded-xl border border-border bg-card p-5">
-              <h2 className="text-2xl">Details</h2>
-              <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-                <Detail label="City" value={couple.wedding_location ?? "Not set"} />
-                <Detail label="Theme" value={couple.theme ?? "Not set"} />
-              </dl>
-              <Button variant="outline" size="sm" className="mt-5" asChild>
-                <Link to="/onboarding">Edit wedding details</Link>
-              </Button>
-            </div>
+            <section className="mt-16 grid gap-10 border-t border-border pt-10 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
+              <div>
+                <Eyebrow>The details</Eyebrow>
+                <dl className="mt-6 divide-y divide-border">
+                  <Detail label="City" value={couple.wedding_location ?? "Not set"} />
+                  <Detail label="Theme" value={couple.theme ?? "Not set"} />
+                  <Detail
+                    label="Guests"
+                    value={couple.guest_count ? String(couple.guest_count) : "Not set"}
+                  />
+                  <Detail
+                    label="Colours"
+                    value={couple.colors?.length ? couple.colors.join(", ") : "Not set"}
+                  />
+                </dl>
+                <Button variant="outline" size="sm" className="mt-8 type-label" asChild>
+                  <Link to="/onboarding">Edit wedding details</Link>
+                </Button>
+              </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild>
-                <Link to="/vendors">Browse vendors</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/saved">My shortlist</Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link to="/messages">Messages</Link>
-              </Button>
-            </div>
+              <div className="grain rounded-lg border border-border bg-card p-6 sm:p-8">
+                <Eyebrow>Next steps</Eyebrow>
+                <p className="type-lede mt-4 text-muted-foreground">
+                  Photographers and venues book first in Addis. Shortlist a few, then start a
+                  conversation to check your date.
+                </p>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <Button asChild className="type-label">
+                    <Link to="/vendors">Browse vendors</Link>
+                  </Button>
+                  <Button variant="outline" asChild className="type-label">
+                    <Link to="/saved">My shortlist</Link>
+                  </Button>
+                  <Button variant="outline" asChild className="type-label">
+                    <Link to="/messages">Messages</Link>
+                  </Button>
+                </div>
+              </div>
+            </section>
           </>
         )}
       </div>
@@ -191,20 +220,21 @@ function StatCard({
   note?: string | undefined;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <Icon className="h-4 w-4 text-primary" />
-      <p className="mt-2 text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-1 font-display text-xl">{value}</p>
-      {note ? <p className="mt-1 text-xs text-muted-foreground">{note}</p> : null}
+    <div className="border-b border-border py-6">
+      <Icon className="size-4 text-primary" aria-hidden />
+      <dt className="type-label mt-4 text-muted-foreground">{label}</dt>
+      <dd className="font-display mt-2 text-2xl">{value}</dd>
+      {note ? <p className="mt-1 text-sm text-muted-foreground">{note}</p> : null}
     </div>
   );
 }
 
 function Detail({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
-      <dd className="mt-1">{value}</dd>
+    <div className="flex items-baseline justify-between gap-6 py-4">
+      <dt className="type-label text-muted-foreground">{label}</dt>
+      <dd className="text-right font-serif text-lg">{value}</dd>
     </div>
   );
 }
+

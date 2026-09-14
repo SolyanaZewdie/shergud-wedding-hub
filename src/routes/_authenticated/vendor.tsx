@@ -6,6 +6,8 @@ import { Trash2 } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StoredImage } from "@/components/StoredImage";
 import { EmptyState, ErrorState, LoadingState } from "@/components/state-blocks";
+import { Eyebrow } from "@/components/editorial";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -202,152 +204,184 @@ function VendorStudio() {
   const readyToList = status === "approved" && offerings.length > 0 && portfolio.length > 0;
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <h1 className="text-3xl sm:text-4xl">Vendor studio</h1>
 
-        {status ? (
-          <div className="mt-5 rounded-lg border border-border bg-card p-4 text-sm">
-            <p>
-              Verification status: <strong className="capitalize">{status}</strong>
-            </p>
-            {status === "pending" ? (
-              <p className="mt-1 text-muted-foreground">
-                Our team is reviewing your listing. You can keep editing while you wait.
-              </p>
-            ) : null}
-            {status === "rejected" ? (
-              <p className="mt-1 text-muted-foreground">
-                {vendor?.rejection_reason ?? "Your listing needs changes before it can go live."}
-              </p>
-            ) : null}
-            {status === "approved" ? (
-              <p className="mt-1 text-muted-foreground">
-                {readyToList
-                  ? "You are live in the marketplace."
-                  : "Approved — add at least one package and one portfolio image to appear in search."}
-              </p>
-            ) : null}
-            {readyToList && vendor ? (
-              <Link
-                to="/vendors/$vendorId"
-                params={{ vendorId: vendor.id }}
-                className="mt-2 inline-block text-primary underline underline-offset-4"
-              >
-                View my public profile
-              </Link>
-            ) : null}
-          </div>
-        ) : (
-          <p className="mt-3 text-sm text-muted-foreground">
-            Create your business listing below. It goes to our team for approval.
+      <header className="grain border-b border-border bg-secondary/40">
+        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
+          <Eyebrow>Vendor studio</Eyebrow>
+          <h1 className="type-display mt-4 text-balance">
+            {vendor?.business_name || "Create your listing"}
+          </h1>
+
+          {status ? (
+            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
+              <span className="type-label flex items-center gap-2">
+                <span
+                  className={`size-2 rounded-full ${
+                    status === "approved"
+                      ? "bg-primary"
+                      : status === "rejected"
+                        ? "bg-destructive"
+                        : "bg-muted-foreground"
+                  }`}
+                  aria-hidden
+                />
+                {status === "approved"
+                  ? readyToList
+                    ? "Live in the marketplace"
+                    : "Approved — one step left"
+                  : status === "pending"
+                    ? "Under review"
+                    : "Changes requested"}
+              </span>
+              <span className="type-label text-muted-foreground">
+                {offerings.length} package{offerings.length === 1 ? "" : "s"} ·{" "}
+                {portfolio.length} image{portfolio.length === 1 ? "" : "s"}
+              </span>
+              {readyToList && vendor ? (
+                <Link
+                  to="/vendors/$vendorId"
+                  params={{ vendorId: vendor.id }}
+                  className="type-label link-arrow text-primary"
+                >
+                  View my public profile
+                </Link>
+              ) : null}
+            </div>
+          ) : null}
+
+          <p className="type-lede mt-6 max-w-2xl text-muted-foreground">
+            {!status
+              ? "Fill in your business details below. Your listing goes to our team for approval."
+              : status === "pending"
+                ? "Our team is reviewing your listing. You can keep editing while you wait."
+                : status === "rejected"
+                  ? (vendor?.rejection_reason ??
+                    "Your listing needs changes before it can go live.")
+                  : readyToList
+                    ? "Couples can find you in search and message you directly."
+                    : "Add at least one package and one portfolio image to appear in search."}
           </p>
-        )}
+        </div>
+      </header>
 
-        <section className="mt-8 rounded-xl border border-border bg-card p-5">
-          <h2 className="text-2xl">Business details</h2>
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
+        <section className="border-t border-border pt-10">
+          <Eyebrow>One · Business details</Eyebrow>
           <form
-            className="mt-4 space-y-4"
+            className="mt-6 grid gap-6 lg:grid-cols-2"
             onSubmit={(e) => {
               e.preventDefault();
               saveDetails.mutate();
             }}
           >
-            <div className="space-y-1.5">
-              <Label htmlFor="business_name">Business name</Label>
+            <div className="space-y-2 lg:col-span-2">
+              <Label htmlFor="business_name" className="type-label text-muted-foreground">
+                Business name
+              </Label>
               <Input
                 id="business_name"
                 defaultValue={vendor?.business_name ?? ""}
                 onChange={(e) => setDetails({ ...details, business_name: e.target.value })}
                 required
+                className="h-12 border-0 border-b border-border bg-transparent px-0 text-xl shadow-none focus-visible:ring-0"
               />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label>Category</Label>
-                <Select
-                  defaultValue={vendor?.category ?? "Photography"}
-                  onValueChange={(v) => setDetails({ ...details, category: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="location">City</Label>
-                <Input
-                  id="location"
-                  defaultValue={vendor?.location ?? ""}
-                  onChange={(e) => setDetails({ ...details, location: e.target.value })}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label className="type-label text-muted-foreground">Category</Label>
+              <Select
+                defaultValue={vendor?.category ?? "Photography"}
+                onValueChange={(v) => setDetails({ ...details, category: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
+            <div className="space-y-2">
+              <Label htmlFor="location" className="type-label text-muted-foreground">
+                City
+              </Label>
+              <Input
+                id="location"
+                defaultValue={vendor?.location ?? ""}
+                onChange={(e) => setDetails({ ...details, location: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="type-label text-muted-foreground">
+                Phone
+              </Label>
               <Input
                 id="phone"
                 defaultValue={vendor?.phone ?? ""}
                 onChange={(e) => setDetails({ ...details, phone: e.target.value })}
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="description">About your work</Label>
+            <div className="space-y-2 lg:col-span-2">
+              <Label htmlFor="description" className="type-label text-muted-foreground">
+                About your work
+              </Label>
               <Textarea
                 id="description"
-                rows={4}
+                rows={5}
                 defaultValue={vendor?.description ?? ""}
                 onChange={(e) => setDetails({ ...details, description: e.target.value })}
+                className="font-serif text-lg"
               />
             </div>
-            <Button type="submit" disabled={saveDetails.isPending}>
-              {saveDetails.isPending ? "Saving..." : vendor ? "Save changes" : "Create listing"}
-            </Button>
+            <div className="lg:col-span-2">
+              <Button type="submit" disabled={saveDetails.isPending} className="type-label">
+                {saveDetails.isPending ? "Saving..." : vendor ? "Save changes" : "Create listing"}
+              </Button>
+            </div>
           </form>
         </section>
 
         {vendor ? (
           <>
-            <section className="mt-8 rounded-xl border border-border bg-card p-5">
-              <h2 className="text-2xl">Packages</h2>
-              <div className="mt-4 space-y-2">
+            <section className="mt-16 border-t border-border pt-10">
+              <Eyebrow>Two · Packages</Eyebrow>
+              <div className="mt-6 divide-y divide-border border-y border-border">
                 {offerings.length ? (
                   offerings.map((o) => (
-                    <div
-                      key={o.id}
-                      className="flex items-center justify-between gap-3 rounded-lg border border-border p-3"
-                    >
+                    <div key={o.id} className="flex items-center justify-between gap-6 py-5">
                       <div>
-                        <p className="font-medium">{o.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatBirr(Number(o.price))}
-                        </p>
+                        <p className="font-display text-xl">{o.name}</p>
+                        {o.description ? (
+                          <p className="mt-1 text-sm text-muted-foreground">{o.description}</p>
+                        ) : null}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Delete package"
-                        onClick={() => deleteOffering.mutate(o.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-4">
+                        <p className="font-serif text-lg">{formatBirr(Number(o.price))}</p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Delete package"
+                          onClick={() => deleteOffering.mutate(o.id)}
+                        >
+                          <Trash2 className="size-4" aria-hidden />
+                        </Button>
+                      </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">No packages yet.</p>
+                  <p className="py-5 font-serif text-lg text-muted-foreground">
+                    No packages yet — add your first one below.
+                  </p>
                 )}
               </div>
 
               <form
-                className="mt-5 grid gap-3 sm:grid-cols-[1fr_140px_auto]"
+                className="mt-6 grid gap-3 sm:grid-cols-[1fr_160px_auto]"
                 onSubmit={(e) => {
                   e.preventDefault();
                   addOffering.mutate();
@@ -367,41 +401,49 @@ function VendorStudio() {
                   onChange={(e) => setOffering({ ...offering, price: e.target.value })}
                   required
                 />
-                <Button type="submit" disabled={addOffering.isPending}>
+                <Button type="submit" disabled={addOffering.isPending} className="type-label">
                   Add
                 </Button>
               </form>
             </section>
 
-            <section className="mt-8 rounded-xl border border-border bg-card p-5">
-              <h2 className="text-2xl">Portfolio</h2>
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                {portfolio.map((item) => (
-                  <div key={item.id} className="relative">
-                    <StoredImage
-                      path={item.image_url}
-                      alt={item.title ?? "Portfolio image"}
-                      className="h-40 w-full rounded-lg"
-                    />
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      aria-label="Delete image"
-                      className="absolute right-2 top-2"
-                      onClick={() => deleteImage.mutate({ id: item.id, path: item.image_url })}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <Label htmlFor="upload">Add an image (max 10 MB)</Label>
+            <section className="mt-16 border-t border-border pt-10">
+              <Eyebrow>Three · Portfolio</Eyebrow>
+              {portfolio.length ? (
+                <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {portfolio.map((item, index) => (
+                    <div key={item.id} className="group relative overflow-hidden">
+                      <StoredImage
+                        path={item.image_url}
+                        alt={item.title ?? "Portfolio image"}
+                        className={`w-full ${index % 3 === 1 ? "aspect-3/4" : "aspect-4/5"}`}
+                      />
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        aria-label="Delete image"
+                        className="absolute right-3 top-3 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                        onClick={() => deleteImage.mutate({ id: item.id, path: item.image_url })}
+                      >
+                        <Trash2 className="size-4" aria-hidden />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-6 font-serif text-lg text-muted-foreground">
+                  Couples browse with their eyes — add a few of your best images.
+                </p>
+              )}
+
+              <div className="mt-8 max-w-md space-y-2">
+                <Label htmlFor="upload" className="type-label text-muted-foreground">
+                  Add an image (max 10 MB)
+                </Label>
                 <Input
                   id="upload"
                   type="file"
                   accept="image/*"
-                  className="mt-1.5"
                   disabled={uploadImage.isPending}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
@@ -410,7 +452,7 @@ function VendorStudio() {
                   }}
                 />
                 {uploadImage.isPending ? (
-                  <p className="mt-2 text-sm text-muted-foreground">Uploading...</p>
+                  <p className="text-sm text-muted-foreground">Uploading...</p>
                 ) : null}
               </div>
             </section>
@@ -420,3 +462,4 @@ function VendorStudio() {
     </div>
   );
 }
+

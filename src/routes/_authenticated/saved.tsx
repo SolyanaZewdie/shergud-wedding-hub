@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VendorCard } from "@/components/VendorCard";
 import { EmptyState, ErrorState, LoadingState } from "@/components/state-blocks";
+import { Eyebrow } from "@/components/editorial";
+
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toggleSavedVendor, type Listing } from "@/lib/data";
@@ -54,42 +56,53 @@ function SavedVendors() {
     },
   });
 
-  return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-        <h1 className="text-3xl sm:text-4xl">Your shortlist</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Vendors you saved while browsing.</p>
+  const count = query.data?.length ?? 0;
 
-        <div className="mt-8">
-          {query.isLoading ? (
-            <LoadingState />
-          ) : query.isError ? (
-            <ErrorState onRetry={() => query.refetch()} />
-          ) : query.data && query.data.length ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {query.data.map((listing) => (
-                <VendorCard
-                  key={listing.id}
-                  listing={listing}
-                  saved
-                  onToggleSave={() => remove.mutate(listing.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              title="Nothing saved yet"
-              description="Tap the heart on any vendor to keep them here."
-              action={
-                <Button asChild>
-                  <Link to="/vendors">Browse vendors</Link>
-                </Button>
-              }
-            />
-          )}
+  return (
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+
+      <header className="grain border-b border-border bg-secondary/40">
+        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-12 sm:px-6 md:flex-row md:items-end md:justify-between lg:py-16">
+          <div>
+            <Eyebrow>Kept for later</Eyebrow>
+            <h1 className="type-display mt-4">Your shortlist</h1>
+          </div>
+          <p className="type-label text-muted-foreground">
+            {count === 0 ? "No vendors yet" : `${count} vendor${count === 1 ? "" : "s"} saved`}
+          </p>
         </div>
+      </header>
+
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
+        {query.isLoading ? (
+          <LoadingState />
+        ) : query.isError ? (
+          <ErrorState onRetry={() => query.refetch()} />
+        ) : query.data && query.data.length ? (
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16">
+            {query.data.map((listing) => (
+              <VendorCard
+                key={listing.id}
+                listing={listing}
+                saved
+                onToggleSave={() => remove.mutate(listing.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="Nothing saved yet"
+            description="Tap the heart on any vendor to keep them here."
+            action={
+              <Button asChild>
+                <Link to="/vendors">Browse vendors</Link>
+              </Button>
+            }
+          />
+        )}
       </div>
     </div>
   );
 }
+

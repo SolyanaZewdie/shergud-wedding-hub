@@ -103,7 +103,7 @@ export function SiteHeader() {
             <>
               <Select value={demoView} onValueChange={(v) => setDemoView(v as AppRole | "auto")}>
                 <SelectTrigger
-                  className="type-label h-9 w-[168px] rounded-none border-border bg-transparent"
+                  className="type-label h-9 w-[196px] rounded-none border-border bg-transparent"
                   aria-label="Demo view"
                 >
                   <SelectValue />

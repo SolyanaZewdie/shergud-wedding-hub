@@ -82,15 +82,24 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed. Try email instead.");
-      return;
+    // Preferred path: the editor's sign-in broker (works inside the preview).
+    // Fallback: the standard Supabase Google flow, which is what runs once this
+    // app is deployed on your own hosting.
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (!result.error) return;
+    } catch {
+      /* fall through to the standard flow */
     }
-    if (result.redirected) return;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+    if (error) toast.error("Google sign-in failed. Try email instead.");
   }
+
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
