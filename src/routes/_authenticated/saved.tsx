@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VendorCard } from "@/components/VendorCard";
 import { EmptyState, ErrorState, LoadingState } from "@/components/state-blocks";
+import { Eyebrow } from "@/components/editorial";
+
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toggleSavedVendor, type Listing } from "@/lib/data";
