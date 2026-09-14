@@ -134,35 +134,45 @@ function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <SiteHeader />
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <h1 className="text-3xl sm:text-4xl">Vendor verification</h1>
 
-        <div className="mt-6 flex gap-2">
-          {(["pending", "approved", "rejected"] as StatusFilter[]).map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatus(s)}
-              className={cn(
-                "rounded-full border px-4 py-1.5 text-sm capitalize transition-colors",
-                s === status
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground",
-              )}
-            >
-              {s}
-            </button>
-          ))}
+      <header className="grain border-b border-border bg-secondary/40">
+        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
+          <Eyebrow>Curation desk</Eyebrow>
+          <h1 className="type-display mt-4">Vendor verification</h1>
+          <p className="type-lede mt-5 max-w-2xl text-muted-foreground">
+            Only approved vendors with at least one package and one portfolio image appear in the
+            marketplace.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 border-t border-border pt-6">
+            {(["pending", "approved", "rejected"] as StatusFilter[]).map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatus(s)}
+                className={cn(
+                  "type-label capitalize transition-colors",
+                  s === status
+                    ? "text-foreground underline decoration-primary decoration-2 underline-offset-8"
+                    : "text-muted-foreground hover:text-foreground/80",
+                )}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
+      </header>
 
-        <div className="mt-8 space-y-4">
-          {vendors.isLoading ? (
-            <LoadingState />
-          ) : vendors.isError ? (
-            <ErrorState onRetry={() => vendors.refetch()} />
-          ) : vendors.data && vendors.data.length ? (
-            vendors.data.map((vendor) => {
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
+        {vendors.isLoading ? (
+          <LoadingState />
+        ) : vendors.isError ? (
+          <ErrorState onRetry={() => vendors.refetch()} />
+        ) : vendors.data && vendors.data.length ? (
+          <div className="divide-y divide-border border-t border-border">
+            {vendors.data.map((vendor) => {
               const offeringCount =
                 (vendor as unknown as { vendor_offerings?: { count: number }[] })
                   .vendor_offerings?.[0]?.count ?? 0;
@@ -170,36 +180,42 @@ function AdminPage() {
                 (vendor as unknown as { vendor_portfolio?: { count: number }[] })
                   .vendor_portfolio?.[0]?.count ?? 0;
               return (
-                <div key={vendor.id} className="rounded-xl border border-border bg-card p-5">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
+                <article key={vendor.id} className="py-8">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <h2 className="font-display text-xl">{vendor.business_name}</h2>
-                      <p className="text-sm text-muted-foreground">
+                      <h2 className="font-display text-2xl">{vendor.business_name}</h2>
+                      <p className="type-label mt-2 text-muted-foreground">
                         {vendor.category} · {vendor.location ?? "No city"} ·{" "}
                         {vendor.phone ?? "No phone"}
                       </p>
                     </div>
-                    <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs capitalize">
+                    <span className="type-label rounded-full border border-border px-3 py-1 capitalize">
                       {vendor.verification_status}
                     </span>
                   </div>
 
                   {vendor.description ? (
-                    <p className="mt-3 text-sm text-muted-foreground">{vendor.description}</p>
+                    <p className="mt-4 max-w-2xl font-serif text-lg leading-relaxed text-muted-foreground">
+                      {vendor.description}
+                    </p>
                   ) : null}
 
-                  <p className="mt-3 text-xs text-muted-foreground">
+                  <p className="type-label mt-4 text-muted-foreground">
                     {offeringCount} package{offeringCount === 1 ? "" : "s"} · {portfolioCount}{" "}
                     portfolio image{portfolioCount === 1 ? "" : "s"}
+                    {offeringCount === 0 || portfolioCount === 0
+                      ? " · incomplete listing"
+                      : " · ready to list"}
                   </p>
                   {vendor.rejection_reason ? (
                     <p className="mt-2 text-sm text-destructive">{vendor.rejection_reason}</p>
                   ) : null}
 
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
                     {status !== "approved" ? (
                       <Button
                         size="sm"
+                        className="type-label"
                         disabled={decide.isPending}
                         onClick={() => decide.mutate({ id: vendor.id, decision: "approved" })}
                       >
@@ -209,7 +225,7 @@ function AdminPage() {
                     {status !== "rejected" ? (
                       <>
                         <Input
-                          className="h-9 w-full sm:w-64"
+                          className="h-9 w-full sm:w-72"
                           placeholder="Reason for rejection"
                           value={reasons[vendor.id] ?? ""}
                           onChange={(e) => setReasons({ ...reasons, [vendor.id]: e.target.value })}
@@ -217,6 +233,7 @@ function AdminPage() {
                         <Button
                           size="sm"
                           variant="outline"
+                          className="type-label"
                           disabled={decide.isPending}
                           onClick={() => decide.mutate({ id: vendor.id, decision: "rejected" })}
                         >
@@ -225,14 +242,15 @@ function AdminPage() {
                       </>
                     ) : null}
                   </div>
-                </div>
+                </article>
               );
-            })
-          ) : (
-            <EmptyState title={`No ${status} vendors`} />
-          )}
-        </div>
+            })}
+          </div>
+        ) : (
+          <EmptyState title={`No ${status} vendors`} />
+        )}
       </div>
     </div>
   );
 }
+
