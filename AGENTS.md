@@ -1,10 +1,13 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# Shergud (ሽር ጉድ) Developer & Agent Guidelines
+
+## Overview
+Shergud is an Ethiopian wedding vendor marketplace built with React 19, Vite, TanStack Router / TanStack Start, Tailwind CSS, and Supabase.
+
+## Database & Backend
+- Supabase provides PostgreSQL, Authentication, Row Level Security (RLS), and Storage.
+- Database schemas, RLS policies, and seed scripts are located in `supabase/schema.sql`.
+
+## Scripts
+- `npm run dev`: Start local Vite development server
+- `npm run build`: Compile full SSR + client production bundle
+- `npm run preview`: Preview production build locally

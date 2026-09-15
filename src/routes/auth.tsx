@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,17 +81,6 @@ function AuthPage() {
   }
 
   async function handleGoogle() {
-    // Preferred path: the editor's sign-in broker (works inside the preview).
-    // Fallback: the standard Supabase Google flow, which is what runs once this
-    // app is deployed on your own hosting.
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (!result.error) return;
-    } catch {
-      /* fall through to the standard flow */
-    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin },
