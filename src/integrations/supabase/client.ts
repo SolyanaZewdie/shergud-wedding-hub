@@ -28,53 +28,40 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
-function createSupabaseClient() {
-  const SUPABASE_URL =
-    (typeof import.meta !== "undefined" && import.meta.env ? import.meta.env["VITE_SUPABASE_URL"] : undefined) ||
-    (typeof process !== "undefined" ? process.env["SUPABASE_URL"] || process.env["VITE_SUPABASE_URL"] : undefined);
+const DEFAULT_SUPABASE_URL = "https://uamphzryzhtbtwkcevhr.supabase.co";
+const DEFAULT_SUPABASE_KEY = "sb_publishable_S2BdPcPgwIA8J0umS0m4fQ_iA2xr_92";
 
-  const SUPABASE_KEY =
-    (typeof import.meta !== "undefined" && import.meta.env
-      ? import.meta.env["VITE_SUPABASE_ANON_KEY"] || import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"]
-      : undefined) ||
+function getSupabaseCredentials() {
+  const url =
+    import.meta.env.VITE_SUPABASE_URL ||
+    (typeof process !== "undefined" ? process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL : undefined) ||
+    DEFAULT_SUPABASE_URL;
+
+  const key =
+    import.meta.env.VITE_SUPABASE_ANON_KEY ||
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
     (typeof process !== "undefined"
-      ? process.env["SUPABASE_ANON_KEY"] ||
-        process.env["VITE_SUPABASE_ANON_KEY"] ||
-        process.env["SUPABASE_PUBLISHABLE_KEY"] ||
-        process.env["VITE_SUPABASE_PUBLISHABLE_KEY"]
-      : undefined);
+      ? process.env.SUPABASE_ANON_KEY ||
+        process.env.VITE_SUPABASE_ANON_KEY ||
+        process.env.SUPABASE_PUBLISHABLE_KEY ||
+        process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+      : undefined) ||
+    DEFAULT_SUPABASE_KEY;
 
-  if (!SUPABASE_URL || !SUPABASE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ["VITE_SUPABASE_URL / SUPABASE_URL"] : []),
-      ...(!SUPABASE_KEY ? ["VITE_SUPABASE_ANON_KEY / SUPABASE_PUBLISHABLE_KEY"] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
-  }
-
-  return createClient<Database>(SUPABASE_URL, SUPABASE_KEY, {
-    global: {
-      fetch: createSupabaseFetch(SUPABASE_KEY),
-    },
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storage: typeof window === "undefined" ? undefined : window.localStorage,
-      storageKey: "shergud-auth",
-    },
-  });
+  return { url, key };
 }
 
-let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
+const { url: SUPABASE_URL, key: SUPABASE_KEY } = getSupabaseCredentials();
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
-  get(_, prop, receiver) {
-    if (!_supabase) _supabase = createSupabaseClient();
-    return Reflect.get(_supabase, prop, receiver);
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_KEY, {
+  global: {
+    fetch: createSupabaseFetch(SUPABASE_KEY),
+  },
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: typeof window === "undefined" ? undefined : window.localStorage,
+    storageKey: "shergud-auth",
   },
 });
