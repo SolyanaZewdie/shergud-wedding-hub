@@ -52,14 +52,14 @@ function Dashboard() {
     enabled: Boolean(user),
   });
 
-  if (view !== "couple") {
+  if (view !== "couple" && view !== "admin") {
     return (
       <div className="min-h-screen">
         <SiteHeader />
         <div className="mx-auto max-w-3xl px-4 py-16">
           <EmptyState
             title="This dashboard is for couples"
-            description="Switch the view selector to the couple view to see the wedding dashboard."
+            description="Sign in as a couple or administrator to see the wedding planning dashboard."
           />
         </div>
       </div>

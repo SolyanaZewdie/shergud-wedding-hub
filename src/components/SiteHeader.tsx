@@ -34,7 +34,7 @@ export function SiteHeader() {
   const account: NavLink[] = [];
 
   if (user) {
-    if (view === "couple") {
+    if (view === "couple" || view === "admin") {
       account.push({ to: "/dashboard", label: "Our wedding" }, { to: "/saved", label: "Saved" });
     }
     if (view === "vendor") account.push({ to: "/vendor", label: "Vendor studio" });
