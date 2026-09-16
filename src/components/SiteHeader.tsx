@@ -1,21 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { useAuth, type AppRole } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 import { Wordmark } from "@/components/Wordmark";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 type NavLink = { to: string; label: string; hash?: string };
 
 export function SiteHeader() {
-  const { user, profile, view, demoView, setDemoView, signOut } = useAuth();
+  const { user, profile, view, signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -101,20 +94,9 @@ export function SiteHeader() {
         <div className="hidden items-center gap-4 md:flex">
           {user ? (
             <>
-              <Select value={demoView} onValueChange={(v) => setDemoView(v as AppRole | "auto")}>
-                <SelectTrigger
-                  className="type-label h-9 w-[196px] rounded-none border-border bg-transparent"
-                  aria-label="Demo view"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="auto">My role: {profile?.role ?? "—"}</SelectItem>
-                  <SelectItem value="couple">Demo: couple view</SelectItem>
-                  <SelectItem value="vendor">Demo: vendor view</SelectItem>
-                  <SelectItem value="admin">Demo: admin view</SelectItem>
-                </SelectContent>
-              </Select>
+              <span className="type-label text-xs text-muted-foreground">
+                {profile?.full_name || profile?.email || "Account"}
+              </span>
               <button
                 onClick={handleSignOut}
                 className="type-label cursor-pointer text-muted-foreground transition-colors hover:text-primary"
@@ -143,26 +125,26 @@ export function SiteHeader() {
         </div>
 
         <button
+          onClick={() => setOpen(true)}
           className="type-label cursor-pointer md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
-          onClick={() => setOpen((o) => !o)}
         >
-          {open ? "Close" : "Menu"}
+          Menu
         </button>
       </div>
 
-      {/* Full-screen editorial mobile navigation */}
+      {/* Mobile nav modal */}
       <div
         id="mobile-nav"
         className={cn(
           "grain fixed inset-0 z-40 flex flex-col bg-espresso text-espresso-foreground transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden",
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none translate-y-3 opacity-0",
+          open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0",
         )}
         aria-hidden={!open}
       >
         <div className="flex items-center justify-between px-5 py-5">
-          <Wordmark compact tone="light" />
+          <Wordmark theme="dark" />
           <button onClick={() => setOpen(false)} className="type-label cursor-pointer">
             Close
           </button>
@@ -176,7 +158,7 @@ export function SiteHeader() {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   to={link.to as any}
                   onClick={() => setOpen(false)}
-                  style={{ transitionDelay: `${80 + i * 45}ms` }}
+                  style={{ transitionDelay: `${80 + i * 40}ms` }}
                   className={cn(
                     "type-display block border-b border-current/12 py-4 transition-all duration-500",
                     open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
@@ -191,20 +173,11 @@ export function SiteHeader() {
           <div className="mt-10 space-y-4">
             {user ? (
               <>
-                <Select value={demoView} onValueChange={(v) => setDemoView(v as AppRole | "auto")}>
-                  <SelectTrigger
-                    className="type-label h-11 rounded-none border-current/25 bg-transparent"
-                    aria-label="Demo view"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="auto">My role: {profile?.role ?? "—"}</SelectItem>
-                    <SelectItem value="couple">Demo: couple view</SelectItem>
-                    <SelectItem value="vendor">Demo: vendor view</SelectItem>
-                    <SelectItem value="admin">Demo: admin view</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="text-center py-2">
+                  <p className="type-label text-sm text-current/70">
+                    {profile?.full_name || profile?.email || "Signed in"}
+                  </p>
+                </div>
                 <button
                   onClick={handleSignOut}
                   className="type-label w-full cursor-pointer border border-current/25 py-4"

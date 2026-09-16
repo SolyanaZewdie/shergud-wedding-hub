@@ -19,37 +19,18 @@ type AuthContextValue = {
   profile: Profile | null;
   role: AppRole | null;
   loading: boolean;
-  /** Demo-mode view override. Never grants real privileges — the database decides. */
-  demoView: AppRole | "auto";
-  setDemoView: (view: AppRole | "auto") => void;
-  /** Which dashboard the UI should present. Purely presentational. */
   view: AppRole | null;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const DEMO_KEY = "shergud.demoView";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [demoView, setDemoViewState] = useState<AppRole | "auto">("auto");
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(DEMO_KEY);
-    if (stored === "couple" || stored === "vendor" || stored === "admin") {
-      setDemoViewState(stored);
-    }
-  }, []);
-
-  const setDemoView = (next: AppRole | "auto") => {
-    setDemoViewState(next);
-    if (next === "auto") window.localStorage.removeItem(DEMO_KEY);
-    else window.localStorage.setItem(DEMO_KEY, next);
-  };
 
   async function loadProfile(userId: string) {
     const { data } = await supabase
@@ -95,9 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile,
       role,
       loading,
-      demoView,
-      setDemoView,
-      view: demoView === "auto" ? role : demoView,
+      view: role,
       refreshProfile: async () => {
         if (session?.user) await loadProfile(session.user.id);
       },
@@ -109,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
       },
     };
-  }, [session, profile, loading, demoView, queryClient]);
+  }, [session, profile, loading, queryClient]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

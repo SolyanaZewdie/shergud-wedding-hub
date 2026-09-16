@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminPage() {
-  const { user, view } = useAuth();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<StatusFilter>("pending");
   const [reasons, setReasons] = useState<Record<string, string>>({});
@@ -93,20 +93,6 @@ function AdminPage() {
     onError: () => toast.error("Couldn't update that vendor"),
   });
 
-  if (view !== "admin") {
-    return (
-      <div className="min-h-screen">
-        <SiteHeader />
-        <div className="mx-auto max-w-3xl px-4 py-16">
-          <EmptyState
-            title="Admin view only"
-            description="Switch the view selector to the admin view to open the review queue."
-          />
-        </div>
-      </div>
-    );
-  }
-
   if (isAdmin.isLoading) {
     return (
       <div className="min-h-screen">
@@ -122,11 +108,11 @@ function AdminPage() {
         <SiteHeader />
         <div className="mx-auto max-w-3xl px-4 py-16">
           <EmptyState
-            title="You don't have admin access"
-            description="Your account isn't an administrator, so vendor decisions are blocked by the database."
+            title="Access restricted"
+            description="You do not have administrator permissions to view or manage vendor verifications."
             action={
               <Button asChild>
-                <Link to="/vendors">Back to marketplace</Link>
+                <Link to="/">Return to home</Link>
               </Button>
             }
           />
