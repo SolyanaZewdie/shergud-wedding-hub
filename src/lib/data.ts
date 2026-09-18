@@ -49,7 +49,7 @@ export async function fetchListings(filters: MarketplaceFilters): Promise<Listin
   let query = supabase.from("vendor_public_listing").select("*");
 
   if (filters.category) query = query.eq("category", filters.category);
-  if (filters.location) query = query.eq("location", filters.location);
+  if (filters.location) query = query.ilike("location", `%${filters.location}%`);
   if (filters.search) query = query.ilike("business_name", `%${filters.search}%`);
   if (filters.maxPrice) query = query.lte("starting_price", filters.maxPrice);
   if (filters.minRating) query = query.gte("rating", filters.minRating);
