@@ -67,7 +67,7 @@ ON CONFLICT (id) DO UPDATE SET
   approved_at = now();
 
 -- 2. Insert Offerings & Pricing (ETB)
-DELETE FROM public.vendor_offerings WHERE vendor_id LIKE 'b0000000-0000-4000-8000-%';
+DELETE FROM public.vendor_offerings WHERE vendor_id::text LIKE 'b0000000-0000-4000-8000-%';
 
 INSERT INTO public.vendor_offerings (vendor_id, name, description, price) VALUES
   -- Photography
@@ -119,7 +119,7 @@ INSERT INTO public.vendor_offerings (vendor_id, name, description, price) VALUES
   ('b0000000-0000-4000-8000-000000000018', 'Royal Cake & Cupcake Favors', '4-tier centerpiece cake plus 100 individual guest favor boxes.', 58000);
 
 -- 3. Insert Portfolio Photos (High resolution, wedding specific)
-DELETE FROM public.vendor_portfolio WHERE vendor_id LIKE 'b0000000-0000-4000-8000-%';
+DELETE FROM public.vendor_portfolio WHERE vendor_id::text LIKE 'b0000000-0000-4000-8000-%';
 
 INSERT INTO public.vendor_portfolio (vendor_id, image_url, title) VALUES
   -- Photography
@@ -171,7 +171,7 @@ INSERT INTO public.vendor_portfolio (vendor_id, image_url, title) VALUES
   ('b0000000-0000-4000-8000-000000000018', 'https://images.unsplash.com/photo-1535141192574-5d4897c13136?w=1200&auto=format&fit=crop&q=80', 'Spiced honey & cardamom tiered cake');
 
 -- 4. Insert Authentic Couple Reviews
-DELETE FROM public.reviews WHERE vendor_id LIKE 'b0000000-0000-4000-8000-%';
+DELETE FROM public.reviews WHERE vendor_id::text LIKE 'b0000000-0000-4000-8000-%';
 
 INSERT INTO public.reviews (vendor_id, author_name, rating, comment, is_sample) VALUES
   -- Photography
